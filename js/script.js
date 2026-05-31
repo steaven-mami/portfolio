@@ -7,15 +7,15 @@ camera.position.z = 6;
 const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 
-const geometry = new THREE.PlaneGeometry(38, 22, 200, 200);
+const geometry = new THREE.PlaneGeometry(80, 50, 200, 200);
 
 const material = new THREE.ShaderMaterial({
   transparent: true,
   uniforms: {
     uTime: { value: 0 },
-    uSpeed: { value: 1.0 },
-    uColor: { value: new THREE.Vector3(0.5, 0.5, 0.5) },
-    uAlpha: { value: 0.3 }
+    uSpeed: { value: 1.5 },
+    uColor: { value: new THREE.Vector3(1.0, 1.0, 1.0) },
+    uAlpha: { value: 0.4 }
   },
   vertexShader: `
     uniform float uTime;
@@ -23,9 +23,9 @@ const material = new THREE.ShaderMaterial({
     varying float vHeight;
     void main(){
       vec3 pos = position;
-      pos.z += (sin(pos.x*0.8 + uTime*0.4*uSpeed) * 1.5 
-              + cos(pos.y*0.5 + uTime*0.5*uSpeed) * 1.5);
-      vHeight = pos.z;
+      pos.y += (sin(pos.x*0.3 + uTime*0.4*uSpeed) * 0.7
+              + cos(pos.x*0.2 + uTime*0.6*uSpeed) * 0.25);
+      vHeight = pos.y;
       gl_Position = projectionMatrix*modelViewMatrix*vec4(pos,1.0);
     }
   `,
@@ -41,10 +41,10 @@ const material = new THREE.ShaderMaterial({
 });
 
 const plane = new THREE.Mesh(geometry, material);
-plane.rotation.x = 0.6;
+plane.rotation.x = 0.3;
 plane.rotation.z = -0.3;
-plane.position.x = 10;
-plane.position.y = 12;
+plane.position.x = 22;
+plane.position.y = 23;
 scene.add(plane);
 
 function animate(time) {
@@ -65,9 +65,9 @@ let blinkInterval = null;
 function waveNormal() {
   clearInterval(blinkInterval);
   canvas.style.visibility = "visible";
-  material.uniforms.uSpeed.value = 1.0;
-  material.uniforms.uColor.value = new THREE.Vector3(0.5, 0.5, 0.5);
-  material.uniforms.uAlpha.value = 0.3;
+  material.uniforms.uSpeed.value = 1.5;
+  material.uniforms.uColor.value = new THREE.Vector3(1.0, 1.0, 1.0);
+  material.uniforms.uAlpha.value = 0.4;
 }
 
 function waveAlert() {
