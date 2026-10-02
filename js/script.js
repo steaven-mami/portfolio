@@ -15,7 +15,7 @@ const material = new THREE.ShaderMaterial({
   transparent: true,
   uniforms: {
     uTime: { value: 0 },
-    uSpeed: { value: 1.5 },
+    uSpeed: { value: 1.8 },
     uColor: { value: new THREE.Vector3(1.0, 1.0, 1.0) },
     uAlpha: { value: 0.4 }
   },
@@ -73,7 +73,7 @@ let blinkInterval = null;
 function waveNormal() {
   clearInterval(blinkInterval);
   canvas.style.visibility = "visible";
-  material.uniforms.uSpeed.value = 1.5;
+  material.uniforms.uSpeed.value = 1.8;
   material.uniforms.uColor.value = new THREE.Vector3(1.0, 1.0, 1.0);
   material.uniforms.uAlpha.value = 0.4;
 }
@@ -91,6 +91,26 @@ const labels = document.querySelectorAll(".nav-label");
 const arrowLeft = document.getElementById("arrow-left");
 const arrowRight = document.getElementById("arrow-right");
 const box = document.getElementById("content-box");
+let language = "en";
+const interfaceText = {
+  en: { hello: "Hello, I'm", tabs: ["Skills", "About me", "Projects"], contact: "Contact me", comingSoon: "Coming soon.", idle: ["Hello...", "Anyone there?", "Yes", "No", "Phew !", "Enjoy your visit !", "Hm...", "Thanks for letting me know", "Hey !", "Over here !", "I'm here !"] },
+  fr: { hello: "Bonjour, je suis", tabs: ["Compétences", "À propos", "Projets"], contact: "Me contacter", comingSoon: "Bientôt disponible.", idle: ["Bonjour...", "Il y a quelqu'un ?", "Oui", "Non", "Ouf !", "Bonne visite !", "Ah...", "Merci de me prévenir", "Hé !", "Je suis là !", "Je suis là !"] }
+};
+const languageButtons = document.querySelectorAll(".language-button");
+
+function applyLanguage(nextLanguage) {
+  language = nextLanguage;
+  document.documentElement.lang = language;
+  labels.forEach((label, index) => { label.textContent = interfaceText[language].tabs[index]; });
+  document.getElementById("contact-text").textContent = interfaceText[language].contact;
+  languageButtons.forEach(button => button.classList.toggle("active", button.dataset.language === language));
+  renderContent();
+  restoreProfile();
+}
+
+languageButtons.forEach(button => {
+  button.addEventListener("click", () => applyLanguage(button.dataset.language));
+});
 
 let current = 1;
 
@@ -99,61 +119,29 @@ function renderContent() {
   const key = sections[current];
 
   if (key === "about") {
-    box.innerHTML = `
-      <p style="animation: fadeText 0.8s ease forwards;">Computer Science student in my third year at Saâd Dahlab University of Blida, Algeria.</p>
-      <hr>
-      <p style="animation: fadeText 0.8s ease forwards;">Originally from Madagascar, I joined the university as a scholarship student — an opportunity I take very seriously.</p>
-      <hr>
-      <p style="animation: fadeText 0.8s ease forwards;">Passionate about software development, I believe coding is above all a creative act. My goal is to build software that has a real impact on people's lives — whether in web, mobile, or desktop development, with AI as a key tool.</p>
-      <hr>
-      <p style="animation: fadeText 0.8s ease forwards;">Outside of coding, I'm a big fan of video games and humor.</p>
-    `;
+    box.innerHTML = content[language].about.map((paragraph, index) => `
+      ${index > 0 ? "<hr>" : ""}
+      <p style="animation: fadeText 0.8s ease forwards;">${paragraph}</p>
+    `).join("");
     return;
   }
 
   if (key === "skills") {
-    const s = content.skills;
-    const maxLang = Math.max(s.languages.comfortable.length, s.languages.working.length);
-    const rows = Array.from({length: maxLang}, (_, i) => `
-      <tr>
-        <td style="padding: 2px 30px 2px 0;">
-          ${s.languages.comfortable[i] ? `<span style="margin-right:8px;">•</span>${s.languages.comfortable[i]}` : ""}
-        </td>
-        <td style="padding: 2px 0;">
-          ${s.languages.working[i] ? `<span style="margin-right:8px;">•</span>${s.languages.working[i]}` : ""}
-        </td>
-      </tr>
-    `).join("");
-
     box.innerHTML = `
-      <div style="animation: fadeText 0.8s ease forwards;">
-        <p style="font-size:30px; font-weight:bold; opacity:0.5; margin: 0 0 12px 0;">Languages</p>
-        <div style="padding-left: 20px; margin-bottom: 30px;">
-          <table style="width:100%; border-collapse:collapse;">
-            <thead>
-              <tr>
-                <th style="text-align:left; padding: 0 30px 8px 0; opacity:0.7; font-weight:normal;">Comfortable with</th>
-                <th style="text-align:left; padding: 0 0 8px 0; opacity:0.7; font-weight:normal;">Working knowledge</th>
-              </tr>
-            </thead>
-            <tbody>${rows}</tbody>
-          </table>
-        </div>
-        <p style="font-size:30px; font-weight:bold; opacity:0.5; margin: 0 0 12px 0;">Tools & Tech</p>
-        <div style="padding-left: 20px; margin-bottom: 30px; line-height:1.8;">
-          ${s.tools.map(t => `<div><span style="margin-right:8px;">•</span>${t}</div>`).join("")}
-        </div>
-        <p style="font-size:30px; font-weight:bold; opacity:0.5; margin: 0 0 12px 0;">Currently Learning</p>
-        <div style="padding-left: 20px; line-height:1.8;">
-          ${s.learning.map(l => `<div><span style="margin-right:8px;">•</span>${l}</div>`).join("")}
-        </div>
+      <div class="skills">
+        ${content[language].skills.map(group => `
+          <h3 class="skills-title">${group.title} :</h3>
+          <ul class="skills-list">
+            ${group.items.map(item => `<li>${item}</li>`).join("")}
+          </ul>
+        `).join("")}
       </div>
     `;
     return;
   }
 
   if (key === "projects") {
-    box.innerHTML = `<p style="opacity:0.4; animation: fadeText 0.8s ease forwards;">Coming soon.</p>`;
+    box.innerHTML = `<p style="opacity:0.4; animation: fadeText 0.8s ease forwards;">${interfaceText[language].comingSoon}</p>`;
     return;
   }
 }
@@ -234,7 +222,7 @@ const helloEl = document.getElementById("hello");
 const firstnameEl = document.getElementById("firstname");
 const fullnameEl = document.getElementById("fullname");
 
-const originalHello = "Hello, I'm";
+const originalHello = { en: "Hello, I'm", fr: "Bonjour, je suis" };
 const originalFirstname = "Mamizara";
 const originalFullname = "Harena Valisoa Steaven";
 
@@ -244,18 +232,18 @@ function resetIdle() {
 }
 
 function restoreProfile() {
-  helloEl.textContent = originalHello;
+  helloEl.textContent = originalHello[language];
   firstnameEl.textContent = originalFirstname;
   fullnameEl.innerHTML = originalFullname;
   waveNormal();
 }
 
 function triggerIdle() {
-  helloEl.textContent = "Hello...";
-  firstnameEl.textContent = "Anyone there?";
+  helloEl.textContent = interfaceText[language].idle[0];
+  firstnameEl.textContent = interfaceText[language].idle[1];
   fullnameEl.innerHTML = `
-    <span id="btn-yes" style="cursor:pointer; border: 2px solid white; padding: 4px 16px; border-radius: 8px; margin-right: 10px; font-size: 30px;">Yes</span>
-    <span id="btn-no" style="cursor:pointer; border: 2px solid white; padding: 4px 16px; border-radius: 8px; font-size: 30px;">No</span>
+    <span id="btn-yes" class="idle-btn">${interfaceText[language].idle[2]}</span>
+    <span id="btn-no" class="idle-btn">${interfaceText[language].idle[3]}</span>
   `;
 
   document.getElementById("btn-yes").addEventListener("click", handleYes);
@@ -263,8 +251,8 @@ function triggerIdle() {
 }
 
 function handleYes() {
-  helloEl.textContent = "Phew !";
-  firstnameEl.textContent = "Enjoy your visit !";
+  helloEl.textContent = interfaceText[language].idle[4];
+  firstnameEl.textContent = interfaceText[language].idle[5];
   fullnameEl.innerHTML = "";
   setTimeout(() => {
     restoreProfile();
@@ -274,14 +262,14 @@ function handleYes() {
 
 function handleNo() {
   waveAlert();
-  helloEl.textContent = "Hm...";
-  firstnameEl.textContent = "Thanks for letting me know";
+  helloEl.textContent = interfaceText[language].idle[6];
+  firstnameEl.textContent = interfaceText[language].idle[7];
   fullnameEl.innerHTML = "";
   setTimeout(() => {
-    helloEl.textContent = "Hey !";
-    firstnameEl.textContent = "Over here !";
+    helloEl.textContent = interfaceText[language].idle[8];
+    firstnameEl.textContent = interfaceText[language].idle[9];
     fullnameEl.innerHTML = `
-      <span id="btn-yes2" style="cursor:pointer; border: 2px solid white; padding: 4px 16px; border-radius: 8px; font-size: 30px;">I'm here !</span>
+      <span id="btn-yes2" class="idle-btn">${interfaceText[language].idle[10]}</span>
     `;
     document.getElementById("btn-yes2").addEventListener("click", () => {
       handleYes();
