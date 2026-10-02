@@ -97,16 +97,26 @@ const interfaceText = {
   fr: { hello: "Bonjour, je suis", tabs: ["Compétences", "À propos", "Projets"], contact: "Me contacter", comingSoon: "Bientôt disponible.", idle: ["Bonjour...", "Il y a quelqu'un ?", "Oui", "Non", "Ouf !", "Bonne visite !", "Ah...", "Merci de me prévenir", "Hé !", "Je suis là !", "Je suis là !"] }
 };
 const languageButtons = document.querySelectorAll(".language-button");
+const mobileLayout = window.matchMedia("(max-width: 900px)");
+
+function updateTabLabels() {
+  const tabLanguage = mobileLayout.matches ? "en" : language;
+  labels.forEach((label, index) => {
+    label.textContent = interfaceText[tabLanguage].tabs[index];
+  });
+}
 
 function applyLanguage(nextLanguage) {
   language = nextLanguage;
   document.documentElement.lang = language;
-  labels.forEach((label, index) => { label.textContent = interfaceText[language].tabs[index]; });
+  updateTabLabels();
   document.getElementById("contact-text").textContent = interfaceText[language].contact;
   languageButtons.forEach(button => button.classList.toggle("active", button.dataset.language === language));
   renderContent();
   restoreProfile();
 }
+
+mobileLayout.addEventListener("change", updateTabLabels);
 
 languageButtons.forEach(button => {
   button.addEventListener("click", () => applyLanguage(button.dataset.language));

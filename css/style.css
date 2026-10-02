@@ -272,16 +272,26 @@ canvas {
 
 .language-button {
   cursor: pointer;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 6px;
-  padding: 6px 10px;
+  min-width: 44px;
+  min-height: 40px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-radius: 8px;
+  padding: 8px 12px;
   color: white;
-  background: transparent;
+  background: rgba(18, 18, 18, 0.82);
   font: inherit;
-  opacity: 0.6;
+  font-weight: 700;
+  opacity: 0.82;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  transition: background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
 }
 
-.language-button.active { opacity: 1; border-color: white; }
+.language-button.active {
+  opacity: 1;
+  border-color: white;
+  background: rgba(255, 255, 255, 0.16);
+}
 
 /* ===== MOBILE ===== */
 @media (max-width: 900px) {
@@ -336,7 +346,12 @@ canvas {
     padding: 20px;
     overflow-y: visible;
   }
-  #language-switch { top: 12px; right: 12px; }
+  #language-switch {
+    position: fixed;
+    top: max(12px, env(safe-area-inset-top));
+    right: max(12px, env(safe-area-inset-right));
+    gap: 8px;
+  }
   #content-box p { font-size: 16px; line-height: 1.7; }
   .idle-btn { font-size: 18px; }
   .skills-title { font-size: 22px; }
