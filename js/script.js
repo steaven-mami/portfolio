@@ -6,6 +6,8 @@ camera.position.z = 6;
 
 const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // MOBILE : plafonné à 2
+
 
 const geometry = new THREE.PlaneGeometry(80, 50, 200, 200);
 
@@ -54,8 +56,14 @@ function animate(time) {
 }
 animate();
 
+// MOBILE : on ignore les resize dus à la barre d'adresse (seule la largeur compte)
+let lastW = window.innerWidth;
+
 window.addEventListener("resize", () => {
+  if (window.innerWidth === lastW) return;
+  lastW = window.innerWidth;
   renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
 });
@@ -283,6 +291,27 @@ function handleNo() {
 
 let idleTimer = setTimeout(triggerIdle, 60000);
 
-["mousemove", "keydown", "click", "scroll"].forEach(evt => {
+// MOBILE : touchstart ajouté pour l'idle
+["mousemove", "keydown", "click", "scroll", "touchstart"].forEach(evt => {
   document.addEventListener(evt, resetIdle);
 });
+
+// MOBILE : swipe gauche/droite pour changer d'onglet
+let touchX = null, touchY = null;
+
+document.addEventListener("touchstart", (e) => {
+  touchX = e.touches[0].clientX;
+  touchY = e.touches[0].clientY;
+}, { passive: true });
+
+document.addEventListener("touchend", (e) => {
+  if (touchX === null) return;
+  const dx = e.changedTouches[0].clientX - touchX;
+  const dy = e.changedTouches[0].clientY - touchY;
+  touchX = null;
+  if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+  current = dx < 0
+    ? (current + 1) % labels.length
+    : (current - 1 + labels.length) % labels.length;
+  updateNav();
+}, { passive: true });

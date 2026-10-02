@@ -17,6 +17,10 @@ body {
   overflow: hidden;
   background: black;
   font-family: 'Inter', sans-serif;
+  /* ÉTAPE 2 : Lissage des polices pour Chrome */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 canvas {
@@ -33,6 +37,8 @@ canvas {
   border-radius: 50%;
   object-fit: cover;
   box-shadow: 0 0 15px rgba(255, 255, 255, 0.3), 0 0 40px rgba(255, 255, 255, 0.1);
+  /* Lissage haute qualité pour Chrome et Firefox */
+  image-rendering: high-quality;
 }
 
 #profile {
@@ -86,6 +92,28 @@ canvas {
   padding: 30px;
   overflow-y: auto;
   box-shadow: 0 0 12px rgba(160, 82, 45, 0.5), 0 0 30px rgba(160, 82, 45, 0.2);
+
+  /* Style fin et discret pour Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+/* Style fin et discret pour Chrome, Safari, Edge */
+#content-box::-webkit-scrollbar {
+  width: 6px;
+}
+
+#content-box::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#content-box::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+}
+
+#content-box::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.5);
 }
 
 #content-box p {
@@ -196,3 +224,67 @@ canvas {
 #contact-label i {
   font-size: 50px;
 }
+
+/* ===== MOBILE ===== */
+@media (max-width: 900px) {
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  canvas { position: fixed; }
+
+  /* fini le positionnement absolu : colonne verticale */
+  #profile, #nav, #content-box, #contact-label, #contact-box {
+    position: relative;
+    top: auto;
+    left: auto;
+  }
+
+  /* profil */
+  #profile {
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 40px;
+    text-align: center;
+  }
+  #profile img {
+    width: clamp(120px, 38vw, 180px);
+    height: clamp(120px, 38vw, 180px);
+  }
+  #profile-text { align-items: center; padding: 0 16px; }
+  #hello { font-size: clamp(18px, 5vw, 28px); }
+  #firstname { font-size: clamp(28px, 8.5vw, 44px); }
+  #fullname { font-size: clamp(20px, 6vw, 36px); }
+  #fullname span[style*="font-size: 30px"] { font-size: 18px !important; }
+
+  /* nav */
+  #nav { justify-content: center; gap: 4px; margin-top: 32px; }
+  #nav-labels { gap: 10px; }
+  .nav-label { font-size: clamp(16px, 5vw, 24px); }
+  #arrow-left, #arrow-right {
+    font-size: 20px;
+    padding: 12px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* boîte de contenu : pleine largeur, la page scrolle */
+  #content-box {
+    width: auto;
+    height: auto;
+    margin: 12px 16px 0;
+    padding: 20px;
+    overflow-y: visible;
+  }
+  #content-box p { font-size: 16px; line-height: 1.7; }
+  #content-box p[style*="font-size:30px"] { font-size: 22px !important; }
+
+  /* contact */
+  #contact-label { width: auto; justify-content: center; margin-top: 32px; }
+  #contact-label i { font-size: 40px; }
+  #contact-box { width: 250px; margin: 12px auto 40px; }
+}
+
